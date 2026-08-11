@@ -1,0 +1,21 @@
+services:
+  swisslib-mcp:
+    build: .
+    image: swisslib-mcp:latest
+    container_name: swisslib-mcp
+    restart: unless-stopped
+    ports:
+      # No auth on this server — bind to loopback once a proxy fronts it:
+      # SWISSLIB_BIND=127.0.0.1 docker compose up -d
+      - "${SWISSLIB_BIND:-0.0.0.0}:8005:8005"
+    environment:
+      - PYTHONUNBUFFERED=1
+      # Optional — see the package's Configuration table (Crossref politeness,
+      # arXiv throttle, OA-legal licence enrichment). None are required.
+      - CROSSREF_MAILTO=${CROSSREF_MAILTO:-}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import socket; socket.create_connection(('localhost', 8005), 3).close()"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
