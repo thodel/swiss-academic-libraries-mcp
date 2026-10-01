@@ -4,6 +4,11 @@ services:
     image: swisslib-mcp:latest
     container_name: swisslib-mcp
     restart: unless-stopped
+    # tei has 3.9 GB for a dozen tenants and no container on it had a limit until
+    # 01.10.2026 (tei-vm-sanity#3). This one measures 20 MB — a thin wrapper around
+    # swisscovery, no corpus of its own — so 100m is already five times what it uses.
+    mem_limit: 100m
+    memswap_limit: 200m
     ports:
       # No auth on this server — bind to loopback once a proxy fronts it:
       # SWISSLIB_BIND=127.0.0.1 docker compose up -d
